@@ -3,11 +3,14 @@ import { defineConfig } from 'astro/config';
 
 // https://astro.build/config
 export default defineConfig({
-  // 1. Replace 'yousuf' with your actual GitHub username
+  // 1. Your GitHub URL
   site: 'https://weirdyousuf.github.io', 
-  
 
-  // 2. Replace 'portfolio' with your exact GitHub repository name
-  // IMPORTANT: If your repository is named EXACTLY 'yousuf.github.io', delete this 'base' line entirely!
-  base: '/clashwithusuf', 
+  // 2. Your Repository Name (with slashes on both sides)
+  base: '/clashwithusuf/', 
+
+  /** * This is the missing piece! 
+   * It forces GitHub to look for /work/ instead of just /work
+   */
+  trailingSlash: 'always', 
 });

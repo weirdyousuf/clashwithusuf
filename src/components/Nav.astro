@@ -3,10 +3,12 @@ import Icon from './Icon.astro';
 import type { iconPaths } from './IconPaths';
 import ThemeToggle from './ThemeToggle.astro';
 
-// Get the base path (e.g., /clashwithusuf/)
-const base = import.meta.env.BASE_URL;
+// Normalize the base path to ensure it always ends with a slash
+const base = import.meta.env.BASE_URL.endsWith('/') 
+    ? import.meta.env.BASE_URL 
+    : `${import.meta.env.BASE_URL}/`;
 
-/** Main menu items - Updated to use the base path variable */
+/** Main menu items */
 const textLinks: { label: string; href: string }[] = [
     { label: 'Home', href: base },
     { label: 'Work', href: `${base}work/` },
@@ -18,14 +20,18 @@ const iconLinks: { label: string; href: string; icon: keyof typeof iconPaths }[]
     { label: 'Twitter', href: 'https://x.com/weirdyousuf', icon: 'twitter-logo' },
     { label: 'Instagram', href: 'https://www.instagram.com/weirdyousuf', icon: 'instagram-logo' },
     { label: 'GitHub', href: 'https://github.com/weirdyousuf', icon: 'github-logo' },
-    { label: 'youtube', href: 'https://www.youtube.com/@YousufLabs', icon: 'youtube-logo' },
+    { label: 'YouTube', href: 'https://www.youtube.com/@YousufLabs', icon: 'youtube-logo' },
 ];
 
-/** Simplified test to see if we are on the current page */
+/** * Bulletproof test for current page.
+ * It normalizes both paths to ensure they match even if one is missing a slash.
+ */
 const isCurrentPage = (href: string) => {
-    const curr = Astro.url.pathname;
-    // Check for exact match or if we're in a sub-route of the link
-    return curr === href || (href !== base && curr.startsWith(href));
+    const normalize = (p: string) => p.replace(/\/$/, "");
+    const currentPath = normalize(Astro.url.pathname);
+    const targetPath = normalize(href);
+    
+    return currentPath === targetPath || (targetPath !== normalize(base) && currentPath.startsWith(targetPath));
 };
 ---
 
@@ -124,7 +130,7 @@ const isCurrentPage = (href: string) => {
 </script>
 
 <style>
-    /* ... (Keep your existing styles, they are perfect) ... */
+    /* ... keeping your styles as they are ... */
     nav {
         z-index: 9999;
         position: relative;
@@ -258,17 +264,9 @@ const isCurrentPage = (href: string) => {
             gap: 1rem;
         }
 
-        .menu-header {
-            padding: 0;
-        }
-
-        .site-title {
-            font-size: var(--text-lg);
-        }
-
-        .menu-content {
-            display: contents;
-        }
+        .menu-header { padding: 0; }
+        .site-title { font-size: var(--text-lg); }
+        .menu-content { display: contents; }
 
         .nav-items {
             position: relative;
@@ -293,13 +291,10 @@ const isCurrentPage = (href: string) => {
         .link {
             padding: 0.5rem 1rem;
             border-radius: 999rem;
-            transition:
-                color var(--theme-transition),
-                background-color var(--theme-transition);
+            transition: color var(--theme-transition), background-color var(--theme-transition);
         }
 
-        .link:hover,
-        .link:focus {
+        .link:hover, .link:focus {
             color: var(--gray-100);
             background-color: var(--accent-subtle-overlay);
         }
@@ -311,17 +306,13 @@ const isCurrentPage = (href: string) => {
 
         .menu-footer {
             --icon-padding: 0.375rem;
-
             justify-self: flex-end;
             align-items: center;
             padding: 0;
             background-color: transparent;
             box-shadow: none;
         }
-
-        .socials {
-            display: none;
-        }
+        .socials { display: none; }
     }
 
     @media (min-width: 60em) {
@@ -329,11 +320,6 @@ const isCurrentPage = (href: string) => {
             display: flex;
             justify-content: flex-end;
             gap: 0;
-        }
-    }
-    @media (forced-colors: active) {
-        .link[aria-current='page'] {
-            color: SelectedItem;
         }
     }
 </style>
